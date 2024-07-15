@@ -14,6 +14,8 @@ public class ProjectService {
         this.projectRepository = projectRepository;
     }
 
+
+    // Метод для получения проекта по его ID
     @Transactional
     public Project getProjectById(Long id) {
         return projectRepository.findById(id).orElse(null);

@@ -11,16 +11,16 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController {
     private final AuthenticationService service;
 
+    //Регистрация пользователя
     @PostMapping("/signUp")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
         return ResponseEntity.ok(service.register(request));
     }
 
-
+    //Аутентификация пользователя
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request
-    ){
+            @RequestBody AuthenticationRequest request){
         return ResponseEntity.ok(service.authenticate(request));
     }
 }

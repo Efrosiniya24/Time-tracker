@@ -28,6 +28,7 @@ public class SecurityConfiguration {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeRequests(authorize -> authorize
+                        // Разрешение неавторизованного доступа к страницам аутентификации и регистрации
                         .requestMatchers("/time-tracker/auth/authenticate", "/time-tracker/auth/signUp")
                         .permitAll()
                         .anyRequest().authenticated())

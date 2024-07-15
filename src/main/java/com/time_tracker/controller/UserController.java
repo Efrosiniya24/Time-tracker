@@ -29,6 +29,7 @@ public class UserController {
     private final UserService userService;
     private final TimeEntryService timeEntryService;
 
+    //Получение списка всех проектов
     @GetMapping("/allProjects")
     public String allProjects() throws JsonProcessingException {
         List<String> allProjects = projectRepository.findAll()
@@ -38,6 +39,7 @@ public class UserController {
         return objectMapper.writeValueAsString(allProjects);
     }
 
+    //Фиксация времени начала выполнения проекта
     @PostMapping("/startProject/{projectId}")
     public ResponseEntity<String> startProject(@PathVariable Long projectId) {
         Project project = projectRepository.findById(projectId).orElse(null);
@@ -51,23 +53,23 @@ public class UserController {
         return ResponseEntity.ok("Time tracking started for project: " + project.getName());
     }
 
+    //Фиксация времени окончания выполнения проекта
     @PostMapping("/stopProject/{projectId}")
     public ResponseEntity<String> stopProject(@PathVariable Long projectId) {
         Project project = projectRepository.findById(projectId).orElse(null);
-        if (project == null) {
+        if (project == null)
             return ResponseEntity.notFound().build();
-        }
 
         User currentUser = userService.getCurrentUser();
         TimeEntry timeEntry = timeEntryService.stopProjectTime(project, currentUser);
         if (timeEntry != null) {
             String duration = timeEntry.getDurationString();
             return ResponseEntity.ok(String.format("Stopped project time tracking. Duration: %s", duration));
-        } else {
+        } else
             return ResponseEntity.badRequest().body("No active time entry found for the project");
-        }
     }
 
+    //Получение общего времени работы над проектом
     @GetMapping("/totalTime/{projectId}")
     public ResponseEntity<String> getTotalTime(@PathVariable Long projectId) {
         Project project = projectRepository.findById(projectId).orElse(null);
@@ -79,12 +81,12 @@ public class UserController {
         return ResponseEntity.ok("Total time worked on project " + project.getName() + ": " + totalTime);
     }
 
+    //Получение времени работы текущего пользователя над проектом
     @GetMapping("/userTimeOnProject/{projectId}")
     public ResponseEntity<String> getUserTimeOnProject(@PathVariable Long projectId) {
         Project project = projectRepository.findById(projectId).orElse(null);
-        if (project == null) {
+        if (project == null)
             return ResponseEntity.notFound().build();
-        }
 
         User currentUser = userService.getCurrentUser();
         String totalTime = timeEntryService.getUserTimeOnProject(project, currentUser);

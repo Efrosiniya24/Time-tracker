@@ -21,12 +21,14 @@ public class AdminService {
     private final TimeEntryRepository timeEntryRepository;
     private final UserRepository userRepository;
 
+    //Метод для получения общего времени, которое пользователи потратили на проект
     public List<Map.Entry<User, String>> getUsersTotalTimeForProject(Long projectId) {
         Project project = new Project();
         project.setId(projectId);
 
         List<Map.Entry<User, String>> usersTotalTime = new ArrayList<>();
 
+        //Вычисление общего времени, потраченного на проект, для каждого пользователя
         List<User> users = userRepository.findAll();
         for (User user : users) {
             String totalTime = getTotalTimeForProjectAndUser(project, user);
@@ -36,13 +38,13 @@ public class AdminService {
         return usersTotalTime;
     }
 
+    //Метод для непосредственного вычисления общего времени для каждого пользователя
     private String getTotalTimeForProjectAndUser(Project project, User user) {
         List<TimeEntry> timeEntries = timeEntryRepository.findByProjectAndUser(project, user);
         long totalSeconds = 0;
         for (TimeEntry entry : timeEntries) {
-            if (entry.getStartTime() != null && entry.getEndTime() != null) {
+            if (entry.getStartTime() != null && entry.getEndTime() != null)
                 totalSeconds += ChronoUnit.SECONDS.between(entry.getStartTime(), entry.getEndTime());
-            }
         }
         long hours = totalSeconds / 3600;
         long minutes = (totalSeconds % 3600) / 60;

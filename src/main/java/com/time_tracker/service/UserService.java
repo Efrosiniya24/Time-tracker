@@ -16,14 +16,11 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    //Метод для получения тпекущего аутентифицированного пользователя
     public User getCurrentUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
-    }
-
-    public Optional<User> getUserById(Long userId) {
-        return userRepository.findById(userId);
     }
 
 }

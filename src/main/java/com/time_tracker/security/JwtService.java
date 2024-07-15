@@ -20,15 +20,19 @@ public class JwtService {
 
     private static final String SECRET_KEY = "EtWBmqNcSkSZT5U1BWVwYTJaGyZz+buud4N0y1Ef4+PD+ofgl69e1a/d1SrrzyUTC5tYx714GyjdvATH+cYZy3lm2bbt9zwxVPTLzoJ0zhmc3qP9eyDXXP4sqyFL9ADhW72FCBuxXKwE22M3by3oIhOBsQ3XxeopZrwOldu+jx5HA4UJBLfOnh6n8OAnJqTomeJTH/mEX34koeP6j+EO92r3YA1BMggD6qs2xceFBOh2y4pds+8rhU1qree10oXg1D4QvWFoQKJ15kUZRbKkgtPskFSo3Rbrc+6sONyaWzBUOFhhE5ZmhhEzEGAw6Rac67JDYc1YzvIcskry1EO7mMtDeq9JUsUGNFm2TjXf+6E=\n";
 
+
+    //Извлечение имени пользователя из токена
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
+    //Извлечение различных данных из токена
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
+    //Генерация JWT токена для пользователя
     public String generateToken(UserDetails userDetails){
         Map<String, Object> claims = new HashMap<>();
         claims.put("roles", userDetails.getAuthorities().stream()
@@ -37,10 +41,11 @@ public class JwtService {
         return generateToken(claims, userDetails);
     }
 
+
+    //Генерация JWT токена с дополнительными данными
     public String generateToken(
             Map<String, Object> extraClaims,
-            UserDetails userDetails
-    ){
+            UserDetails userDetails){
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
@@ -51,20 +56,24 @@ public class JwtService {
                 .compact();
     }
 
+    // Проверка валидности токена
     public boolean isTokenValid(String token, UserDetails userDetails){
         final String username = extractUsername(token);
         final List<String> roles = extractRoles(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
+    // Проверка истечения срока действия токена
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
+    // Извлечение даты истечения срока действия токена
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
+    // Извлечение всех данных из токена
     private Claims extractAllClaims(String token) throws JwtException {
         return Jwts
                 .parser()
@@ -74,11 +83,13 @@ public class JwtService {
                 .getBody();
     }
 
+    // Получение ключа для подписи токена
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    // Извлечение ролей пользователя из токена
     private List<String> extractRoles(String token) {
         Claims claims = extractAllClaims(token);
         return claims.get("roles", List.class);
